@@ -8,7 +8,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remend from 'remend';
-import type {StreamPresentation} from './useStreamPresentation';
+import type {StreamPresentation} from './types';
 
 export const streamBubbleClassName =
   'chat-prose max-w-full min-w-0 font-medium rounded-2xl rounded-bl-md px-1.5 py-2.5 text-[14px] text-slate-900 prose prose-slate prose-sm prose-p:my-1 prose-headings:my-2 prose-pre:bg-slate-900 prose-pre:text-slate-100';
@@ -28,8 +28,8 @@ const markdownLink = {
 
 type RehypePlugins = ComponentProps<typeof ReactMarkdown>['rehypePlugins'];
 
-// Rehype: wrap text chunks in span for per-chunk fade. Whitespace stays
-// plain text; skip pre/code/script/style.
+// Rehype plugin that wraps text chunks in a span for per-chunk fade. Whitespace
+// stays plain text, and pre/code/script/style are skipped.
 const CHUNK_SKIP_TAGS = new Set(['pre', 'code', 'script', 'style']);
 
 const WORD_SPLIT = /\S+|\s+/g;
@@ -97,8 +97,8 @@ function makeChunkWrapPlugin(split: RegExp, className: string): RehypePlugins {
 const WORD_REHYPE_PLUGINS = makeChunkWrapPlugin(WORD_SPLIT, 'stream-word');
 const PHRASE_REHYPE_PLUGINS = makeChunkWrapPlugin(PHRASE_SPLIT, 'stream-phrase');
 
-// Heal incomplete markdown each render (avoids streaming flicker). Memoized for
-// word-queue's per-word re-renders.
+// Heal incomplete markdown on each render to avoid streaming flicker. Memoized
+// for word-queue's per-word re-renders.
 const StreamMarkdown = memo(function StreamMarkdown({
   text,
   rehypePlugins,
@@ -118,9 +118,9 @@ const StreamMarkdown = memo(function StreamMarkdown({
   );
 });
 
-// Queue reveal renderer. Full string -> markdown each tick; rehype pre-wraps chunks.
-// useLayoutEffect fades only new chunks (pre-paint, no re-trigger flicker).
-// Caret uses container ::after.
+// Queue reveal renderer. Renders the full string to markdown each tick, and
+// rehype pre-wraps the chunks. useLayoutEffect fades only the new chunks,
+// pre-paint, so nothing re-triggers and flickers. The caret is container ::after.
 function AnimatedChunks({
   text,
   animationClass,
@@ -181,7 +181,7 @@ export function StreamContentRenderer({
       />
     );
   }
-  // Instant: no per-chunk animation.
+  // Instant mode, no per-chunk animation.
   return (
     <div>
       <StreamMarkdown text={presentation.visibleText} />

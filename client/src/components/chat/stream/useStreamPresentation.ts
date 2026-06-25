@@ -8,18 +8,7 @@ import {
 } from './streamConfig';
 import {resolveStreamEffect, type StreamVisualMode} from './streamEffects';
 import {usePrefersReducedMotion} from './usePrefersReducedMotion';
-
-export interface StreamPresentation {
-  mode: StreamVisualMode;
-  visibleText: string;
-  chunkKind?: 'word' | 'phrase';
-  chunkAnimationClass?: string;
-  chunkAnimationDurationMs?: number;
-  hasVisibleContent: boolean;
-  showCaret: boolean;
-  // True when animation settled and finalize may run.
-  isPresentationComplete: boolean;
-}
+import type {StreamPresentation} from './types';
 
 interface UseStreamPresentationOptions {
   mode?: StreamVisualMode;
@@ -28,7 +17,7 @@ interface UseStreamPresentationOptions {
   isGenerating: boolean;
 }
 
-// Same queue engine; word vs phrase differ in tokenizer and cadence.
+// Same queue engine. Word and phrase differ only in tokenizer and cadence.
 const QUEUE_REVEALS = {
   'word-queue': {
     kind: 'word' as const,
@@ -53,7 +42,7 @@ export function useStreamPresentation({
   const prefersReducedMotion = usePrefersReducedMotion();
   const effect = resolveStreamEffect(mode, prefersReducedMotion);
 
-  // instant has no queue; word config is an inert default.
+  // instant has no queue, so the word config here is just an inert default.
   const isQueue = effect.reveal !== 'instant';
   const queue =
     effect.reveal === 'phrase-queue'
@@ -89,7 +78,7 @@ export function useStreamPresentation({
     };
   }
 
-  // Instant: whole buffer, no animation.
+  // Instant mode. Whole buffer, no animation.
   return {
     mode: effect.name as StreamVisualMode,
     visibleText: receivedText,
@@ -98,8 +87,6 @@ export function useStreamPresentation({
     isPresentationComplete: isStreamComplete,
   };
 }
-
-// --- Tokenizers -------------------------------------------------------------
 
 // Lossless "word + trailing whitespace" tokens.
 function tokenizeWords(text: string): string[] {
@@ -119,7 +106,7 @@ function stableWordTokens(text: string, isStreamComplete: boolean): string[] {
   return tokens;
 }
 
-// Lossless phrases on .!?\n (naive on 3.14, e.g. - fine for fade).
+// Lossless phrases on .!?\n. Naive on things like 3.14, but fine for fade.
 function tokenizePhrases(text: string): string[] {
   return text.match(/[\s\S]*?[.!?\n]+[ \t]*|[\s\S]+$/g) ?? [];
 }
@@ -137,8 +124,6 @@ function stablePhraseTokens(text: string, isStreamComplete: boolean): string[] {
   return tokens;
 }
 
-// --- Chunk-queue reveal -----------------------------------------------------
-
 interface ChunkQueueRevealOptions {
   active: boolean;
   fullText: string;
@@ -149,7 +134,7 @@ interface ChunkQueueRevealOptions {
   flushMs: number;
 }
 
-// Fixed-cadence chunk reveal; tokenizer and interval differ per mode.
+// Fixed-cadence chunk reveal. Tokenizer and interval differ per mode.
 function useChunkQueueReveal({
   active,
   fullText,
@@ -231,7 +216,7 @@ function useChunkQueueReveal({
   const count = Math.min(revealed, tokens.length);
   return {
     visibleText: tokens.slice(0, count).join(''),
-    // Reveal caught up; finalize still waits for fade (useAnimationSettled).
+    // Reveal caught up. Finalize still waits for the fade (useAnimationSettled).
     caughtUp: isStreamComplete && count >= tokens.length,
   };
 }

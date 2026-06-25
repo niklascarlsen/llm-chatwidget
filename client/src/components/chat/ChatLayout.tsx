@@ -1,74 +1,47 @@
-import type {ChatMessage} from './types';
-import {ChatHeader} from './ChatHeader';
-import {MessageItem} from './MessageItem';
-import {ScrollButton} from './ScrollButton';
-import {InputSection} from './InputSection';
-import {QuickQuestionsSection} from './QuickQuestionsSection';
-import {StreamingDisplay, type StreamPresentation} from './stream';
+import {ChatHeader} from './ui/ChatHeader';
+import {MessageItem} from './ui/MessageItem';
+import {ScrollButton} from './ui/ScrollButton';
+import {InputSection} from './ui/InputSection';
+import {QuickQuestionsSection} from './ui/QuickQuestionsSection';
+import {StreamingDisplay} from './stream';
+import {useChat} from './context/ChatContext';
 
-interface ChatLayoutProps {
-  messages: ChatMessage[];
-  message: string;
-  loading: boolean;
-  hasStarted: boolean;
-  isGenerating: boolean;
-  queuePosition: number | null;
-  queueLength: number | null;
-  scrollToBottom: (behavior?: ScrollBehavior) => void;
-  isSomeoneProcessing: boolean;
-  receivedText: string;
-  streamPresentation: StreamPresentation;
-  isReasoning: boolean;
-  liveAnnouncement: string;
-  statusAnnouncement: string;
-  greeting: string;
-  chatContainerRef: React.RefObject<HTMLDivElement | null>;
-  chatEndRef: React.RefObject<HTMLDivElement | null>;
-  setMessages: (m: ChatMessage[]) => void;
-  onCloseChat: () => void;
-  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  sendPrompt: (quickPrompt?: string) => void;
-  onRetry: () => void;
-  userScrolledUp: boolean;
-}
+export const ChatLayout = () => {
+  const {
+    messages,
+    input,
+    loading,
+    receivedText,
+    streamPresentation,
+    isReasoning,
+    liveAnnouncement,
+    statusAnnouncement,
+    greeting,
+    queueLength,
+    hasStarted,
+    queuePosition,
+    isSomeoneProcessing,
+    clearMessages,
+    chatContainerRef,
+    isGenerating,
+    closeChat,
+    handleInputChange,
+    sendPrompt,
+    retryLastMessage,
+    chatEndRef,
+    userScrolledUp,
+    scrollToBottom,
+  } = useChat();
 
-export const ChatLayout = ({
-  messages,
-  message,
-  loading,
-  receivedText,
-  streamPresentation,
-  isReasoning,
-  liveAnnouncement,
-  statusAnnouncement,
-  greeting,
-  queueLength,
-  hasStarted,
-  queuePosition,
-  isSomeoneProcessing,
-  setMessages,
-  chatContainerRef,
-  isGenerating,
-  onCloseChat,
-  handleInputChange,
-  sendPrompt,
-  onRetry,
-  chatEndRef,
-  userScrolledUp,
-  scrollToBottom,
-}: ChatLayoutProps) => {
   const hasMessages = messages.length > 0;
 
-  const handleNewChat = () => {
-    setMessages([]);
-  };
   return (
     <div className='relative flex min-w-0 flex-col h-full bg-white overflow-hidden'>
       <ChatHeader
         hasMessages={hasMessages}
         loading={loading}
-        onNewChat={handleNewChat}
-        onClose={onCloseChat}
+        onNewChat={clearMessages}
+        onClose={closeChat}
       />
 
       {hasMessages ? (
@@ -88,7 +61,9 @@ export const ChatLayout = ({
                 key={i}
                 message={msg}
                 onRetry={
-                  i === arr.length - 1 && msg.isError ? onRetry : undefined
+                  i === arr.length - 1 && msg.isError
+                    ? retryLastMessage
+                    : undefined
                 }
               />
             ))}
@@ -130,7 +105,7 @@ export const ChatLayout = ({
       />
 
       <InputSection
-        message={message}
+        message={input}
         loading={loading}
         isGenerating={isGenerating}
         handleInputChange={handleInputChange}

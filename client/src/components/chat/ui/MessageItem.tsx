@@ -1,7 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {CHAT_ERRORS} from '@/lib/errors';
-import type {ChatMessage} from './types';
+import type {ChatMessage} from '../types';
 
 interface MessageItemProps {
   message: ChatMessage;
@@ -18,15 +18,18 @@ export const MessageItem = ({message, onRetry}: MessageItemProps) => {
       : 'Something went wrong';
 
     return (
-      <div className='flex mt-4 mb-4 px-1.5 min-w-0 justify-center' role='alert'>
+      <div
+        className='flex my-8 justify-center mx-auto px-1.5 min-w-0'
+        role='alert'
+      >
         <div className='max-w-full min-w-0 text-center rounded-2xl bg-white px-3.5 py-2.5'>
-          <p className='text-xl font-medium text-rose-900'>{title}</p>
-          <p className='text-xs text-slate-800/90'>{message.content}</p>
+          <p className='text-xl font-medium text-red-900'>{title}</p>
+          <p className='text-xs mt-0.5 text-slate-800/90'>{message.content}</p>
           {onRetry && (
             <button
               type='button'
               onClick={onRetry}
-              className='mt-3 rounded-lg border cursor-pointer border-slate-300 px-3 py-1 text-xs font-medium text-slate-800 transition-colors hover:bg-slate-100'
+              className='mt-3 rounded-lg border cursor-pointer border-slate-300 px-3.5 py-1.5 text-xs font-medium text-slate-800 transition-colors hover:bg-slate-100'
             >
               Try again
             </button>

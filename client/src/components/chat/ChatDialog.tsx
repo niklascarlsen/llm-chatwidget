@@ -3,7 +3,7 @@ import {useScrollLock} from '@/hooks/useScrollLock';
 import {useTouchScrollGuard} from '@/hooks/useTouchScrollGuard';
 import {useIsMobileViewport} from '@/hooks/useIsMobileViewport';
 
-interface ChatWidgetProps {
+interface ChatDialogProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
@@ -14,7 +14,7 @@ type DialogMode = 'modal' | 'non-modal';
 // Chat shell on a native <dialog>.
 // Mobile: showModal() for focus trap and native ESC.
 // Desktop: show() so the page behind stays interactive.
-export const ChatWidget = ({isOpen, onClose, children}: ChatWidgetProps) => {
+export const ChatDialog = ({isOpen, onClose, children}: ChatDialogProps) => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const dialogModeRef = useRef<DialogMode | null>(null);

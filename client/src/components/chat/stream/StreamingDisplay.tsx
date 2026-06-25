@@ -1,6 +1,6 @@
-import {getQueueStatusLabel} from '../getQueueStatusLabel';
+import {getQueueStatusLabel} from '../../../lib/getQueueStatusLabel';
 import {StreamContentRenderer, streamBubbleClassName} from './streamRenderers';
-import type {StreamPresentation} from './useStreamPresentation';
+import type {StreamPresentation} from './types';
 
 interface StreamingDisplayProps {
   isGenerating: boolean;
