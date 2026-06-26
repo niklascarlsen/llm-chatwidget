@@ -14,8 +14,13 @@ export interface OutgoingMessage {
   content: string;
 }
 
+// Which backend serves the request. ollama uses the queue; cloud providers don't.
+export type Provider = 'ollama' | 'gemini';
+
 export interface ClientRequest {
   id: string;
+  // Missing means ollama, for older clients.
+  provider?: Provider;
   model: string;
   messages: OutgoingMessage[];
 }
@@ -33,11 +38,20 @@ export interface DoneServerMessage {
   id: string;
 }
 
+// Why the server sent an error. Client maps this to user-facing copy.
+export type ServerErrorCode =
+  | 'rate_limit' // too many requests
+  | 'unavailable' // provider or model down or misconfigured
+  | 'timeout' // hit the per-request cap
+  | 'transient'; // retry might work
+
 export interface ErrorServerMessage {
   type: 'error';
-  // Absent for pre-queue errors (bad JSON / missing params) that fire before
-  // we have a request to attribute them to.
+  // Missing on bad JSON etc before we have a request id
   id?: string;
+  // Client maps code to copy. Missing means transient.
+  code?: ServerErrorCode;
+  // For logs and old clients. UI uses code, not message.
   message: string;
 }
 

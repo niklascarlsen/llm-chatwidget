@@ -1,4 +1,4 @@
-import type {OutgoingMessage} from '@chatwidget/shared';
+import type {ProviderRequest, ProviderStreamEvent} from '../core/provider';
 
 const OLLAMA_API_URL =
   process.env.OLLAMA_API_URL ?? 'http://localhost:11434/api/chat';
@@ -16,18 +16,6 @@ interface OllamaChunk {
 interface OllamaShowResponse {
   capabilities?: string[];
 }
-
-export interface OllamaRequest {
-  model: string;
-  messages: OutgoingMessage[];
-  signal?: AbortSignal;
-}
-
-export type OllamaStreamEvent =
-  | {kind: 'started'; reasoning: boolean}
-  | {kind: 'content'; delta: string}
-  | {kind: 'done'}
-  | {kind: 'error'; message: string};
 
 const thinkCapabilityCache = new Map<string, boolean>();
 
@@ -59,8 +47,8 @@ async function modelSupportsThinking(model: string): Promise<boolean> {
 }
 
 export async function* streamOllamaChat(
-  req: OllamaRequest
-): AsyncGenerator<OllamaStreamEvent> {
+  req: ProviderRequest
+): AsyncGenerator<ProviderStreamEvent> {
   const think = await modelSupportsThinking(req.model);
 
   const res = await fetch(OLLAMA_API_URL, {
@@ -79,6 +67,7 @@ export async function* streamOllamaChat(
     const errorBody = await res.text().catch(() => '');
     yield {
       kind: 'error',
+      code: 'unavailable',
       message: `Ollama API error (${res.status}): ${errorBody}`,
     };
     return;
@@ -114,7 +103,7 @@ export async function* streamOllamaChat(
         }
 
         if (data.error) {
-          yield {kind: 'error', message: data.error};
+          yield {kind: 'error', code: 'transient', message: data.error};
           return;
         }
 

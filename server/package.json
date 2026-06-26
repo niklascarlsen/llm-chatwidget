@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@chatwidget/shared": "*",
+    "@google/genai": "^2.10.0",
     "hono": "^4.6.14"
   },
   "devDependencies": {
