@@ -26,8 +26,9 @@ Bun monorepo. Protocol types live in `shared/` so client and server stay in sync
 ```
 ├── client/
 │   └── components/chat/
-│       ├── context/         ChatProvider — all chat state via useChat()
-│       ├── hooks/           WebSocket state machine, messages, scroll, UI
+│       ├── chatSocket.ts    module-singleton WebSocket layer -> writes to store
+│       ├── store/           Zustand store (chatStore.ts)
+│       ├── hooks/           scroll + UI/a11y effects
 │       └── ui/              presentational; streamed markdown via streamdown
 ├── shared/                  WebSocket message types
 └── server/
@@ -37,7 +38,7 @@ Bun monorepo. Protocol types live in `shared/` so client and server stay in sync
     └── core/                rate limit, pump, shared helpers
 ```
 
-The client prop-drills nothing: state lives in `ChatProvider` and is read through the `useChat()` context, composed from domain hooks (connection, messages, scroll, UI).
+All chat state lives in one Zustand store (`store/chatStore.ts`); each component selects just the slice it needs, so a keystroke or token re-renders its own leaf instead of the whole tree like before. The WebSocket sits in `chatSocket.ts` and pushes incoming text into the store.
 
 Clients send an optional `provider` field (`ollama` or `gemini`; defaults to `ollama`).
 
@@ -52,7 +53,7 @@ bun install
 bun run dev
 ```
 
-**Model / provider:** `SELECTED_MODEL` and `SELECTED_PROVIDER` in `client/src/components/chat/hooks/useChatMessages.ts`.
+**Model / provider:** `SELECTED_MODEL` and `SELECTED_PROVIDER` in `client/src/components/chat/store/chatStore.ts`.
 
 **Gemini (optional):** set `GEMINI_API_KEY` in the server environment. Without it the server still boots; only Gemini requests fail.
 

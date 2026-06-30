@@ -1,20 +1,16 @@
 import {ArrowDown} from '@/icons/ArrowDown';
+import {useChatStore} from '@/components/chat/store/chatStore';
 
 interface ScrollButtonProps {
-  userScrolledUp: boolean;
-  hasMessages: boolean;
-  loading: boolean;
-  isGenerating: boolean;
   scrollToBottom: (behavior?: ScrollBehavior) => void;
 }
 
-export const ScrollButton = ({
-  userScrolledUp,
-  hasMessages,
-  loading,
-  isGenerating,
-  scrollToBottom,
-}: ScrollButtonProps) => {
+export const ScrollButton = ({scrollToBottom}: ScrollButtonProps) => {
+  const userScrolledUp = useChatStore((s) => s.userScrolledUp);
+  const hasMessages = useChatStore((s) => s.messages.length > 0);
+  const loading = useChatStore((s) => s.loading);
+  const isGenerating = useChatStore((s) => s.isGenerating);
+
   const shouldShow = userScrolledUp && hasMessages && !loading && !isGenerating;
   if (!shouldShow) return null;
 

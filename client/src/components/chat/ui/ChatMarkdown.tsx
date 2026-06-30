@@ -1,11 +1,9 @@
 import {memo} from 'react';
 import {Streamdown, type Components} from 'streamdown';
 
-// Word fade duration. ChatProvider waits this long after done before finalizing,
-// so keep them in sync.
+// Per-word fade-in duration passed to Streamdown.
 export const STREAM_FADE_DURATION_MS = 220;
 
-// Open links in a new tab, same style in streaming and finished messages.
 const components = {
   a: (props: unknown) => {
     const {href, children} = props as {
@@ -28,8 +26,6 @@ const components = {
 interface ChatMarkdownProps {
   text: string;
   className?: string;
-  // True while streaming: words fade in and a caret trails. Off for finished
-  // messages so there is no animation work.
   isAnimating?: boolean;
 }
 

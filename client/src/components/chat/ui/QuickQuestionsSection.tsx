@@ -1,13 +1,8 @@
+import {useChatStore} from '@/components/chat/store/chatStore';
+
 interface QuickQuestion {
   label: string;
   prompt: string;
-}
-
-interface QuickQuestionsSectionProps {
-  hasMessages: boolean;
-  greeting: string;
-  sendPrompt: (quickPrompt?: string) => void;
-  loading: boolean;
 }
 
 const quickQuestions: QuickQuestion[] = [
@@ -34,13 +29,11 @@ const quickQuestions: QuickQuestion[] = [
   },
 ];
 
-export const QuickQuestionsSection = ({
-  hasMessages,
-  greeting,
-  sendPrompt,
-  loading,
-}: QuickQuestionsSectionProps) => {
-  if (hasMessages) return null;
+// Shown when there are no messages yet.
+export const QuickQuestionsSection = () => {
+  const greeting = useChatStore((s) => s.greeting);
+  const loading = useChatStore((s) => s.loading);
+  const sendPrompt = useChatStore((s) => s.sendPrompt);
 
   return (
     <main

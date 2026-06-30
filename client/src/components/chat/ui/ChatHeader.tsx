@@ -1,19 +1,13 @@
 import {RotateCcw} from '@/icons/RotateCcw';
 import {X} from '@/icons/X';
+import {useChatStore} from '@/components/chat/store/chatStore';
 
-interface ChatHeaderProps {
-  hasMessages: boolean;
-  loading: boolean;
-  onNewChat: () => void;
-  onClose: () => void;
-}
+export const ChatHeader = () => {
+  const hasMessages = useChatStore((s) => s.messages.length > 0);
+  const loading = useChatStore((s) => s.loading);
+  const onNewChat = useChatStore((s) => s.clearMessages);
+  const onClose = useChatStore((s) => s.closeChat);
 
-export const ChatHeader = ({
-  hasMessages,
-  loading,
-  onNewChat,
-  onClose,
-}: ChatHeaderProps) => {
   return (
     <header className='grid shrink-0 grid-cols-[2.5rem_1fr_2.5rem] items-center h-12 border-b border-slate-200 bg-white px-2'>
       <div>

@@ -1,16 +1,15 @@
-import {ChatButton} from './ui/ChatTriggerButton';
-import {ChatDialog} from './ChatDialog';
-import {ChatLayout} from './ChatLayout';
-import {ChatProvider} from './context/ChatProvider';
-import {useChat} from './context/ChatContext';
+import {ChatButton} from '@/components/chat/ui/ChatTriggerButton';
+import {ChatDialog} from '@/components/chat/ChatDialog';
+import {ChatLayout} from '@/components/chat/ChatLayout';
+import {ChatEffects} from '@/components/chat/ChatEffects';
+import {useChatStore} from '@/components/chat/store/chatStore';
 
-// Launcher + dialog shell. All chat state lives in ChatProvider and is consumed
-// via useChat(), so nothing is prop-drilled through here.
 function ChatShell() {
-  const {isChatOpen, setIsChatOpen, closeChat} = useChat();
+  const isChatOpen = useChatStore((s) => s.isChatOpen);
+  const closeChat = useChatStore((s) => s.closeChat);
   return (
     <>
-      <ChatButton setIsOpen={setIsChatOpen} isOpen={isChatOpen} />
+      <ChatButton />
       <ChatDialog isOpen={isChatOpen} onClose={closeChat}>
         <ChatLayout />
       </ChatDialog>
@@ -20,8 +19,9 @@ function ChatShell() {
 
 export default function ChatMain() {
   return (
-    <ChatProvider>
+    <>
+      <ChatEffects />
       <ChatShell />
-    </ChatProvider>
+    </>
   );
 }

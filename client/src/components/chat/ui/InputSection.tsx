@@ -2,29 +2,20 @@ import {useRef} from 'react';
 import {ArrowUp} from '@/icons/ArrowUp';
 import {LoaderCircle} from '@/icons/LoaderCircle';
 import {Square} from '@/icons/Square';
+import {useChatStore} from '@/components/chat/store/chatStore';
 
-interface InputSectionProps {
-  message: string;
-  loading: boolean;
-  isGenerating: boolean;
-  hasStarted: boolean;
-  isReasoning: boolean;
-  handleInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  sendPrompt: (quickPrompt?: string) => void;
-  stopGeneration: () => void;
-}
-
-export const InputSection = ({
-  message,
-  loading,
-  isGenerating,
-  hasStarted,
-  isReasoning,
-  handleInputChange,
-  sendPrompt,
-  stopGeneration,
-}: InputSectionProps) => {
+export const InputSection = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const message = useChatStore((s) => s.input);
+  const loading = useChatStore((s) => s.loading);
+  const isGenerating = useChatStore((s) => s.isGenerating);
+  const hasStarted = useChatStore((s) => s.hasStarted);
+  const isReasoning = useChatStore((s) => s.isReasoning);
+  const setInput = useChatStore((s) => s.setInput);
+  const sendPrompt = useChatStore((s) => s.sendPrompt);
+  const stopGeneration = useChatStore((s) => s.stopGeneration);
+
   const isInFlight = loading || isGenerating;
   const canStop = isInFlight && hasStarted && !isReasoning;
   const isWaiting = isInFlight && !canStop;
@@ -40,7 +31,7 @@ export const InputSection = ({
           ref={textareaRef}
           id='chat-input'
           value={message}
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey && !loading && !isGenerating) {
               e.preventDefault();
